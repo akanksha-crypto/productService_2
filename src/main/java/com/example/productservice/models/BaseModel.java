@@ -1,2 +1,10 @@
-package com.example.productservice.models;public class BaseModel {
+package com.example.productservice.models;
+
+import java.util.Date;
+
+public class BaseModel {
+    private Long id;
+    private Date createdAt;
+    private Date lastUpdatedAt;
+    private boolean isDeleted;
 }

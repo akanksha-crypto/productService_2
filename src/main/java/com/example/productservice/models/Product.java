@@ -1,2 +1,4 @@
-package com.example.productservice.models;public class Product {
+package com.example.productservice.models;
+
+public class Product {
 }

@@ -1,2 +1,16 @@
-package com.example.productservice.dto;public class ProductDto {
+package com.example.productservice.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class ProductDto {
+    private String title;
+    private double price;
+    private String description;
+    private String image;
+    private String category;
 }
