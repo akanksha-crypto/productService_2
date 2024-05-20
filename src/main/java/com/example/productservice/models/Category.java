@@ -1,4 +1,10 @@
 package com.example.productservice.models;
 
-public class Category {
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class Category extends BaseModel{
+    private String name;
 }
