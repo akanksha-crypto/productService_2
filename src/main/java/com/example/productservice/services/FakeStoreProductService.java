@@ -1,6 +1,7 @@
 package com.example.productservice.services;
 
 import com.example.productservice.dto.ProductDto;
+import com.example.productservice.exceptions.ProductNotFoundException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -28,7 +29,7 @@ public class FakeStoreProductService implements ProductService{
         List<Product> answer = new ArrayList<>();
         for(ProductDto productDto : l.getBody())
         {
-            Product product = new Product();
+           /* Product product = new Product();
             product.setId(productDto.getId());
             product.setTitle(productDto.getTitle());
             product.setPrice(productDto.getPrice());
@@ -37,17 +38,19 @@ public class FakeStoreProductService implements ProductService{
             Category category =new Category();
             category.setName(productDto.getCategory());
             product.setCategory(category);
-            answer.add(product);
+            answer.add(product);*/
+
+            answer.add(productDto.toProduct());
         }
         return answer;
     }
 
     @Override
-    public Product getSingleProduct(Long productId) {
+    public Product getSingleProduct(Long productId) throws ProductNotFoundException {
         RestTemplate restTemplate = restTemplateBuilder.build();
         ResponseEntity<ProductDto> response = restTemplate.getForEntity("https://fakestoreapi.com/products/{id}",
                 ProductDto.class, productId);
-        ProductDto productDto = response.getBody();
+       /* ProductDto productDto = response.getBody();
         Product product = new Product();
         product.setId(productDto.getId());
         product.setTitle(productDto.getTitle());
@@ -56,9 +59,14 @@ public class FakeStoreProductService implements ProductService{
         product.setImageUrl(productDto.getImage());
         Category category =new Category();
         category.setName(productDto.getCategory());
-        product.setCategory(category);
+        product.setCategory(category);*/
 
-        return product;
+        if(response == null)
+        {
+            throw new ProductNotFoundException("Product with id" + productId + "not found" +
+                    "Try a product with id less than 21");
+        }
+        return response.getBody().toProduct();
         //(url, returntype(converting json which we receive to the returntype), paramaters in url)
     }
 
