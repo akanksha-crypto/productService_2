@@ -1,9 +1,10 @@
 package com.example.productservice.controllers;
 
-import com.example.productservice.dto.ErrorDto;
 import com.example.productservice.dto.ProductDto;
+import com.example.productservice.dto.ErrorDto;
 import com.example.productservice.dto.ProductResponseDto;
 import com.example.productservice.exceptions.ProductNotFoundException;
+import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
 import org.modelmapper.ModelMapper;
@@ -13,7 +14,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ProductController {
@@ -28,19 +31,26 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<Product> getAllProducts()
+    public List<ProductResponseDto> getAllProducts()
     {
-        return productService.getAllProducts();
+        List<Product> products = productService.getAllProducts();
+        List<ProductResponseDto> productResponseDtos = new ArrayList<>();
+        for(Product product : products)
+        {
+            productResponseDtos.add(convertToProductResponseDto(product));
+        }
+        return productResponseDtos;
     }
     @GetMapping("/products/{productId}")
-    public ResponseEntity<Product> getSingleProduct(@PathVariable("productId") Long productId) throws ProductNotFoundException {
+    public ResponseEntity<ProductResponseDto> getSingleProduct(@PathVariable("productId") Long productId) throws ProductNotFoundException {
 //        ProductResponseDto productResponseDto = new ProductResponseDto();
 //        productResponseDto.setProduct(productService.getSingleProduct(productId));
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
                 headers.add("auth-token", "noaccess jhupijhupijhapajhapa");
+        Product product1 = productService.getSingleProduct(productId);
 
-        ResponseEntity<Product> response =new ResponseEntity<>(
-                  productService.getSingleProduct(productId), headers,
+        ResponseEntity<ProductResponseDto> response =new ResponseEntity<>(
+                  convertToProductResponseDto(product1), headers,
                   HttpStatus.NOT_FOUND);
         return response;
 
@@ -54,21 +64,40 @@ public class ProductController {
 //    }
 
     @PostMapping("/products")
-    public ResponseEntity<Product> addNewProduct(@RequestBody ProductDto product)
+    public ResponseEntity<ProductResponseDto> addNewProduct(@RequestBody ProductDto product)
     {
         Product newProduct = productService.addNewProduct(product);
-        ResponseEntity<Product> response = new ResponseEntity<>(newProduct, HttpStatus.OK);
+        ResponseEntity<ProductResponseDto> response = new ResponseEntity<>(convertToProductResponseDto(newProduct),
+                HttpStatus.OK);
         return response;
     }
-    @PutMapping("/products/{productId}")
-    public String updateProduct(@PathVariable("productId") Long productId)
-    {
-        return "updating product with id : " + productId;
+    @PatchMapping ("/products/{productId}")
+    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("productId") Long productId,
+                                                            @RequestBody ProductDto productDto) throws ProductNotFoundException {
+        Product product =new Product();
+        product.setDescription(productDto.getDescription());
+        product.setTitle(productDto.getTitle());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImage());
+        product.setCategory(new Category());
+        product.getCategory().setName(productDto.getCategory());
+        Product updatedProduct = productService.updateProduct(productId, product);
+        ResponseEntity<ProductResponseDto> response =new ResponseEntity<>(convertToProductResponseDto(product),
+                HttpStatus.NOT_FOUND);
+        return response;
     }
     @DeleteMapping("/products/{productId}")
     public String deleteProduct(@PathVariable("productId") Long productId)
     {
         return "deleting product with id : " + productId;
+    }
+
+    public ProductResponseDto convertToProductResponseDto(Product product)
+    {
+        String categoryName = product.getCategory().getName();
+        ProductResponseDto productResponseDto = modelMapper.map(product, ProductResponseDto.class);
+        productResponseDto.setCategory(categoryName);
+        return productResponseDto;
     }
 
     //Add Exception Handler

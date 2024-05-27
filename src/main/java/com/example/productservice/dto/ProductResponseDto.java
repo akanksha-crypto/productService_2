@@ -9,13 +9,11 @@ import lombok.Setter;
 @Setter
 public class ProductResponseDto {
 
-      private Product product;
-/*
+ //     private Product product;
     private Long id;
     private String title;
     private double price;
     private String description;
-    private Category category;
+    private String category;
     private String imageUrl;
-*/
 }
