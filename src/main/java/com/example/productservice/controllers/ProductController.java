@@ -8,6 +8,7 @@ import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,7 +25,7 @@ public class ProductController {
     private  ProductService productService;
     private ModelMapper modelMapper;
 
-    public ProductController(ProductService productService, ModelMapper modelMapper)
+    public ProductController(@Qualifier("selfProductService") ProductService productService, ModelMapper modelMapper)
     {
         this.productService=productService;
         this.modelMapper = modelMapper;
@@ -87,9 +88,11 @@ public class ProductController {
         return response;
     }
     @DeleteMapping("/products/{productId}")
-    public String deleteProduct(@PathVariable("productId") Long productId)
-    {
-        return "deleting product with id : " + productId;
+    public ResponseEntity<ProductResponseDto> deleteProduct(@PathVariable("productId") Long productId) throws ProductNotFoundException {
+        Product deletedProduct = productService.deleteProduct(productId);
+        ResponseEntity<ProductResponseDto> response = new ResponseEntity<>(
+                convertToProductResponseDto(deletedProduct), HttpStatus.OK);
+        return response;
     }
 
     public ProductResponseDto convertToProductResponseDto(Product product)

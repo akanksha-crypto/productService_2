@@ -6,7 +6,6 @@ import com.example.productservice.exceptions.ProductNotFoundException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
 
     private RestTemplateBuilder restTemplateBuilder;
@@ -118,7 +117,10 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public boolean deleteProduct(Long productId) {
-        return false;
+    public Product deleteProduct(Long productId) throws ProductNotFoundException {
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        ResponseEntity<FakeStoreProductDto> response = restTemplate.exchange("https://fakestoreapi.com/products/{id}",
+                HttpMethod.DELETE, null, FakeStoreProductDto.class);
+        return  response.getBody().toProduct1();
     }
 }
