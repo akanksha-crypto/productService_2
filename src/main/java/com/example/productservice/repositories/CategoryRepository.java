@@ -2,8 +2,14 @@ package com.example.productservice.repositories;
 
 import com.example.productservice.models.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Category save(Category category);
     Category findByName(String name);
+
+  //  @Query("select c.name from Category c where c.name like %name")
+    List<Category> findByNameEndingWith(String name);
 }

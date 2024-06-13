@@ -9,6 +9,7 @@ import com.example.productservice.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("selfProductService")
 public class SelfProductService implements ProductService{
@@ -39,10 +40,10 @@ public class SelfProductService implements ProductService{
 
     @Override
     public Product addNewProduct(ProductDto product) {
-        ProductDto newProduct = new ProductDto();
+        Product newProduct = new Product();
         newProduct.setTitle(product.getTitle());
         newProduct.setDescription(product.getDescription());
-        newProduct.setImage(product.getImage());
+        newProduct.setImageUrl(product.getImage());
         newProduct.setPrice(product.getPrice());
 
         String categoryInDb = product.getCategory();
@@ -54,8 +55,8 @@ public class SelfProductService implements ProductService{
           //  categoryRepository.save(newCategory);
             categoryInDb1 = newCategory;
         }
-        newProduct.setCategory(String.valueOf(categoryInDb1));
-        Product savedproduct = productRepository.save(newProduct.toProduct());
+        newProduct.setCategory(categoryInDb1);
+        Product savedproduct = productRepository.save(newProduct);
         return savedproduct;
     }
 
