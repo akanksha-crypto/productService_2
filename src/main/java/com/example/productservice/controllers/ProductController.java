@@ -1,8 +1,10 @@
 package com.example.productservice.controllers;
 
+import com.example.productservice.authcommons.AuthenticationCommons;
 import com.example.productservice.dto.ProductDto;
 import com.example.productservice.dto.ErrorDto;
 import com.example.productservice.dto.ProductResponseDto;
+import com.example.productservice.dto.UserDto;
 import com.example.productservice.exceptions.ProductNotFoundException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
@@ -24,11 +26,15 @@ public class ProductController {
 
     private  ProductService productService;
     private ModelMapper modelMapper;
+    private AuthenticationCommons authenticationCommons;
 
-    public ProductController(@Qualifier("selfProductService") ProductService productService, ModelMapper modelMapper)
+    public ProductController(@Qualifier("selfProductService") ProductService productService,
+                             ModelMapper modelMapper,
+                             AuthenticationCommons authenticationCommons)
     {
         this.productService=productService;
         this.modelMapper = modelMapper;
+        this.authenticationCommons = authenticationCommons;
     }
 
     @GetMapping("/products")
@@ -43,16 +49,24 @@ public class ProductController {
         return productResponseDtos;
     }
     @GetMapping("/products/{productId}")
-    public ResponseEntity<ProductResponseDto> getSingleProduct(@PathVariable("productId") Long productId) throws ProductNotFoundException {
+    public ResponseEntity<ProductResponseDto> getSingleProduct(@PathVariable("productId") Long productId,
+                                                               @RequestHeader String authenticationtoken) {
 //        ProductResponseDto productResponseDto = new ProductResponseDto();
 //        productResponseDto.setProduct(productService.getSingleProduct(productId));
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-                headers.add("auth-token", "noaccess jhupijhupijhapajhapa");
+      //  MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+      //          headers.add("auth-token", "noaccess jhupijhupijhapajhapa");
+        ResponseEntity<ProductResponseDto> response = null;
+        UserDto userDto = authenticationCommons.validateToken(authenticationtoken);
+        if (userDto == null){
+            response = new ResponseEntity<>(null,
+                    HttpStatus.UNAUTHORIZED);
+            return response;
+        }
         Product product1 = productService.getSingleProduct(productId);
 
-        ResponseEntity<ProductResponseDto> response =new ResponseEntity<>(
-                  convertToProductResponseDto(product1), headers,
-                  HttpStatus.NOT_FOUND);
+        response =new ResponseEntity<>(
+                  convertToProductResponseDto(product1),
+                  HttpStatus.OK);
         return response;
 
     }

@@ -48,7 +48,7 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product getSingleProduct(Long productId) throws ProductNotFoundException {
+    public Product getSingleProduct(Long productId){
         RestTemplate restTemplate = restTemplateBuilder.build();
         ResponseEntity<FakeStoreProductDto> response = restTemplate.getForEntity("https://fakestoreapi.com/products/{id}",
                 FakeStoreProductDto.class, productId);

@@ -29,13 +29,13 @@ public class SelfProductService implements ProductService{
     }
 
     @Override
-    public Product getSingleProduct(Long productId) throws ProductNotFoundException {
-        Product singleproduct = productRepository.findByIdIs(productId);
-        if(singleproduct == null)
+    public Product getSingleProduct(Long productId) throws ProductNotFoundException{
+        Optional<Product> singleproduct = productRepository.findByIdIs(productId);
+        if(singleproduct.isEmpty())
         {
             throw new ProductNotFoundException("Product with " + productId + " not found");
         }
-        return singleproduct;
+        return singleproduct.get();
     }
 
     @Override
@@ -62,12 +62,12 @@ public class SelfProductService implements ProductService{
 
     @Override
     public Product updateProduct(Long productId, Product product) throws ProductNotFoundException {
-        Product updatingProduct = productRepository.findByIdIs(productId);
-        if(updatingProduct == null)
+        Optional<Product> updatingProduct = productRepository.findByIdIs(productId);
+        if(updatingProduct.isEmpty())
         {
             throw new ProductNotFoundException("Product with " + productId + " not found");
         }
-        if(updatingProduct.getCategory() != null)
+        if(updatingProduct.get().getCategory() != null)
         {
             String newcategoryInDb = String.valueOf(product.getCategory());
             Category categoryInDb1 = categoryRepository.findByName(newcategoryInDb);
@@ -78,31 +78,31 @@ public class SelfProductService implements ProductService{
                 //  categoryRepository.save(newCategory);
                 categoryInDb1 = newCategory;
             }
-            updatingProduct.setCategory(categoryInDb1);
+            updatingProduct.get().setCategory(categoryInDb1);
         }
-        if (updatingProduct.getDescription()!= null)
+        if (updatingProduct.get().getDescription()!= null)
         {
-            updatingProduct.setDescription(product.getDescription());
+            updatingProduct.get().setDescription(product.getDescription());
         }
-        if(updatingProduct.getPrice() != 0)
+        if(updatingProduct.get().getPrice() != 0)
         {
-            updatingProduct.setPrice(product.getPrice());
+            updatingProduct.get().setPrice(product.getPrice());
         }
-        if(updatingProduct.getTitle()!=null)
+        if(updatingProduct.get().getTitle()!=null)
         {
-            updatingProduct.setTitle(product.getTitle());
+            updatingProduct.get().setTitle(product.getTitle());
         }
-        return productRepository.save(updatingProduct);
+        return productRepository.save(updatingProduct.get());
     }
 
     @Override
     public Product deleteProduct(Long productId) throws ProductNotFoundException {
-        Product product = productRepository.findByIdIs(productId);
+        Optional<Product> product = productRepository.findByIdIs(productId);
         if(product == null)
         {
             throw new ProductNotFoundException("Product with " + productId + " not found");
         }
         productRepository.deleteById(productId);
-        return product;
+        return product.get();
     }
 }
